@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #F1F3F4;
+}
+
+/* Estilo general del scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+	height: 5px;
+}
+
+/* Fondo de la barra */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Barra de desplazamiento */
+::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+	border-radius: 0.5rem;
+}
+
+::-webkit-scrollbar-track-piece {
+	border-radius: 0.5rem;
+}
