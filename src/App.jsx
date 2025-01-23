@@ -174,7 +174,7 @@ const App = () => {
     <div className="p-2 md:p-6">
       <header className="px-4 md:px-8 ">
         <h1 className="flex gap-x-4 items-center text-2xl">
-          <img src={"/public/favicon2.png"} alt="logo pelota" className="max-w-full w-[50px] object-cover" />
+          <img src={"/favicon2.png"} alt="logo pelota" className="max-w-full w-[50px] object-cover" />
           Football
         </h1>
       </header>
