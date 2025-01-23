@@ -99,6 +99,10 @@ const App = () => {
         accessor: "name",
       },
       {
+        Header: "Crest",
+        accessor: "badge",
+      },
+      {
         Header: "Country",
         accessor: "country",
       },
@@ -113,10 +117,6 @@ const App = () => {
       {
         Header: "Titles",
         accessor: "titles",
-      },
-      {
-        Header: "Crest",
-        accessor: "badge",
       },
       {
         Header: "Colors",
