@@ -28,20 +28,24 @@ const Table = ({ changeSorting, data, columns }) => {
     <div className="rounded-lg overflow-x-auto border-gray-200 ">
       <table className="text-center min-w-full bg-white" {...getTableProps()}>
         <thead>
-          {headerGroups.map((headerGroup, index) => (
-            <tr key={index} {...headerGroup.getHeaderGroupProps()} className="">
-              {headerGroup.headers.map((column) => (
+          {headerGroups.map((headerGroup, index) => {
+            const { key, ...restProps} = headerGroup.getHeaderGroupProps()
+            return (
+            <tr key={key} {...restProps} className="">
+              {headerGroup.headers.map((column) => {
+                const { key, ...restProps } = column.getHeaderProps()
+                return (
                 <th
-                  key={column.id}
-                  {...column.getHeaderProps()}
+                  key={key}
+                  {...restProps}
                   className="p-4 text-[12px] leading-[22px] font-semibold text-[#666767]"
                   onClick={() => changeSorting(column.id)}
                 >
                   {column.render("Header")}
                 </th>
-              ))}
+              )})}
             </tr>
-          ))}
+          )})}
         </thead>
         <tbody {...getTableBodyProps()}>
           {rows.map((row) => {
@@ -49,14 +53,14 @@ const Table = ({ changeSorting, data, columns }) => {
             return (
               <tr
                 key={row.id}
-                {...row.getRowProps()}
                 className="bg-white rounded-lg shadow-sm my-1"
               >
                 {row.cells.map((cell) => {
+                  const { key, ...restProps } = cell.getCellProps()
                   return (
                   <td
-                    key={cell.row.original.id}
-                    {...cell.getCellProps()}
+                    key={key}
+                    {...restProps}
                     className="p-4 text-[12px] leading-[22px] text-[#2E373D] border-r last:border-r-0 "
                   >
                     {cell.column.id === "badge" ? (

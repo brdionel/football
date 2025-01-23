@@ -785,8 +785,8 @@ export const countryLeagueMap = {
 export const SortBy = {
     NONE: "none",
     NAME: "name",
-    COUNTRY: "league",
-    LEAGUE: "country",
+    COUNTRY: "country",
+    LEAGUE: "league",
     FOUNDED: "founded",
     TITLES: "titles",
     BADGE: "badge",

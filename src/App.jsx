@@ -50,13 +50,15 @@ const App = () => {
   };
 
   const handleChangeSort = (sort) => {
-    if ([SortBy.NONE, SortBy.BADGE, SortBy.COLORS, SortBy.LOCATION, SortBy.COUNTRY, SortBy.LEAGUE].includes(sort))
-      return
-    setSorting(sort);
-    setSortOrder((prev) => ({
+    if ([SortBy.NONE, SortBy.BADGE, SortBy.COLORS, SortBy.LOCATION].includes(sort)) {
+      return setSorting(sort);
+    }
+    setSorting(sort)
+    setSortOrder((prev) => {
+      return ({
       ...prev,
       [sort]: prev[sort] === 'asc' ? 'desc' : 'asc',
-    }));
+    })});
   };
 
   const handleFilterSubmit = () => {
@@ -139,18 +141,13 @@ const App = () => {
   const sortedTimes = useMemo(() => {
     let sortedData = filteredData;
 
-    if ([SortBy.NONE, SortBy.BADGE, SortBy.COLORS, SortBy.LOCATION, SortBy.COUNTRY, SortBy.LEAGUE].includes(sorting)) return sortedData;
+    if ([SortBy.NONE, SortBy.BADGE, SortBy.COLORS, SortBy.LOCATION].includes(sorting)) return sortedData;
 
     if (sorting === SortBy.NAME) {
       sortedData = sortedData.toSorted((a, b) => a.name.localeCompare(b.name));
     }
     if (sorting === SortBy.COUNTRY) {
-      sortedData = [...sortedData].sort((a, b) => {
-        // Normaliza y convierte a minúsculas para una comparación consistente
-        const countryA = a.country ? a.country.toLowerCase().normalize() : '';
-        const countryB = b.country ? b.country.toLowerCase().normalize() : '';
-        return countryA.localeCompare(countryB);
-      });
+      sortedData = sortedData.toSorted((a, b) => a.country.localeCompare(b.country));
     }
     if (sorting === SortBy.LEAGUE) {
       sortedData = sortedData.toSorted((a, b) => a.league.localeCompare(b.league));
@@ -166,6 +163,8 @@ const App = () => {
     if (sortOrder[sorting] === 'desc') {
       sortedData = sortedData.reverse();
     }
+
+    console.log("Filtered data for sorting:", sortedData.map((team) => team.country));
 
     return sortedData;
   }, [filteredData, sorting, sortOrder]);
