@@ -1,67 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Slider from "rc-slider";
 import { GrFormSearch } from "react-icons/gr";
 import { GrFormClose } from "react-icons/gr";
 import { GrFormFilter } from "react-icons/gr";
-import Slider from "rc-slider";
+import { colors, countryLeagueMap, maxYear, minYear } from "../constants";
 import "rc-slider/assets/index.css";
-
-export const minYear = 1850; // Año mínimo
-export const maxYear = new Date().getFullYear();
-
-const colors = [
-  {
-    value: "Red",
-    color: "#DA291C",
-  },
-  {
-    value: "Pink",
-    color: "#F1C1C1",
-  },
-  {
-    value: "Light Blue",
-    color: "#6CABDD",
-  },
-  {
-    value: "White",
-    color: "#FFFFFF",
-  },
-  {
-    value: "Dark Red",
-    color: "#C8102E",
-  },
-  {
-    value: "Cyan",
-    color: "#00A9E0",
-  },
-  {
-    value: "Navy Blue",
-    color: "#003A63",
-  },
-  {
-    value: "Light Gray",
-    color: "#F0F0F0",
-  },
-  {
-    value: "Blue",
-    color: "#0000FF",
-  },
-  {
-    value: "Yellow",
-    color: "#FFDD00",
-  },
-  {
-    value: "Black",
-    color: "#000000",
-  },
-  {
-    value: "Green",
-    color: "#0B6623",
-  },
-  {
-    value: "Gold",
-    color: "#FFD700",
-  },
-];
 
 const FilterDrawer = ({
   clearFilters,
@@ -75,8 +18,68 @@ const FilterDrawer = ({
   search,
   setOpen,
 }) => {
+
+  const [availableLeagues, setAvailableLeagues] = useState([]);
+  const [titlesErrorValue, setTitlesErrorValue] = useState(null)
+
+  useEffect(() => {
+    if (filters.country === "") {
+      const nestedLeagues = Object.values(countryLeagueMap);
+      const flatNestedLeaguas = nestedLeagues.flat()
+      setAvailableLeagues(flatNestedLeaguas)
+    }
+  }, [filters.country])
+
   const handleChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    if (key === "country") {
+      setFilters((prev) => ({
+        ...prev,
+        country: value,
+        league: "",
+      }));
+      setAvailableLeagues(countryLeagueMap[value] || []);
+    } else if (key === "league") {
+      const country = Object.keys(countryLeagueMap).find((item) =>
+        countryLeagueMap[item].includes(value)
+      );
+      setFilters((prev) => ({
+        ...prev,
+        league: value,
+        country: country || "",
+      }));
+    } else if (key === "titles") {
+      setFilters((prev) => ({
+        ...prev,
+        titles: value
+      }));
+
+      if (value.trim() === "") {
+        setTitlesErrorValue(null);
+        setFilters((prev) => ({
+          ...prev,
+          titles: "", // Resetea el filtro si está vacío
+        }));
+        return;
+      }
+    
+      // Si no es un número, se muestra el error.
+      if (isNaN(value)) {
+        setTitlesErrorValue("The value must be a number");
+        return;
+      }
+    
+      // Si el valor es negativo, muestra el error.
+      if (value < 0) {
+        setTitlesErrorValue("The value must be greater than or equal to 0");
+        return;
+      }
+    
+      // Si pasa las validaciones, limpia el error y guarda el valor.
+      setTitlesErrorValue(null);
+      
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleSliderChange = ([min, max]) => {
@@ -155,13 +158,11 @@ const FilterDrawer = ({
                 className="block w-full p-2 border border-[#D0D0D0] rounded-lg bg-white outline-none"
               >
                 <option value="">All</option>
-                <option value="Spain">Spain</option>
-                <option value="Argentina">Argentina</option>
-                <option value="England">England</option>
-                <option value="Italy">Italy</option>
-                <option value="Germany">Germany</option>
-                <option value="Brazil">Brazil</option>
-                <option value="Colombia">Colombia</option>
+                {Object.keys(countryLeagueMap).map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -176,26 +177,29 @@ const FilterDrawer = ({
                 className="block w-full p-2 border border-[#D0D0D0] rounded-lg bg-white outline-none"
               >
                 <option value="">All</option>
-                <option value="La Liga">La Liga</option>
-                <option value="Primera División">Primera División</option>
-                <option value="Premier League">Premier League</option>
-                <option value="Serie A">Serie A</option>
-                <option value="Bundesliga">Bundesliga</option>
-                <option value="Brasileirão">Brasileirão</option>
-                <option value="Categoría Primera A">Categoría Primera A</option>
+                {availableLeagues.map((league) => (
+                  <option key={league} value={league}>
+                    {league}
+                  </option>
+                ))}
               </select>
             </div>
 
             {/* Titles Filter */}
             <div className="my-4 w-full">
               <h3 className="mb-4 text-center text-base font-bold text-[#000000] uppercase">
-                Titles
+                Minimum Titles
               </h3>
               <input
                 value={filters.titles}
                 onChange={(e) => handleChange("titles", e.target.value)}
                 className="block w-full p-2 border border-[#D0D0D0] rounded-lg bg-white outline-none"
               />
+              {
+                titlesErrorValue && <small className="text-xs text-red-500">
+                  {titlesErrorValue}
+                </small>
+              }
             </div>
 
             {/* Colors Filter */}
@@ -217,11 +221,10 @@ const FilterDrawer = ({
                 {colors.map((color) => (
                   <label
                     key={color}
-                    className={`pl-[15px] flex items-center mb-2 rounded-lg bg-white text-xs leading-[14px] min-h-[40px] w-full pointer justify-start gap-x-2 border-2  ${
-                      filters.colors?.includes(color.color)
-                        ? "border-[#000000]"
-                        : "border-transparent"
-                    }
+                    className={`pl-[15px] flex items-center mb-2 rounded-lg bg-white text-xs leading-[14px] min-h-[40px] w-full pointer justify-start gap-x-2 border-2  ${filters.colors?.includes(color.color)
+                      ? "border-[#000000]"
+                      : "border-transparent"
+                      }
                       `}
                     style={{
                       boxShadow:
@@ -235,8 +238,8 @@ const FilterDrawer = ({
                           const newColors = e.target.checked
                             ? [...(prevFilters.colors || []), color.color]
                             : prevFilters.colors.filter(
-                                (c) => c !== color.color
-                              );
+                              (c) => c !== color.color
+                            );
                           return { ...prevFilters, colors: newColors };
                         })
                       }
@@ -302,18 +305,19 @@ const FilterDrawer = ({
               onClick={clearFilters}
             >
               <span className="Icons_v2_geral-iv2-icon_clean font-icons text-[2.125rem] leading-[2.5rem]"></span>
-              <span> Limpar tudo</span>
+              <span>Clear All</span>
             </button>
             <button
-              className="flex h-[39px] w-[193px] items-center justify-center bg-[#999999] text-sm font-medium text-[#FFFFFF]"
+              className={`flex h-[39px] w-[193px] items-center justify-center bg-[#003A63] text-sm font-medium text-[#FFFFFF] ${titlesErrorValue ? "opacity-30": "opacity-100"}`}
               onClick={handleFilterSubmit}
+              disabled={titlesErrorValue}
               style={{
                 boxShadow:
                   "0px 1px 2px 1px #00000026 border border-[#999999] rounded-sm",
               }}
             >
               <span className="Icons_v2_geral-iv2-icon_filter font-icons text-[2.125rem] leading-[2.5rem]"></span>
-              <span>Aplicar filtros</span>
+              <span>Apply Filters</span>
             </button>
           </div>
         </div>

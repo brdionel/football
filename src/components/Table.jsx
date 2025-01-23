@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useTable } from "react-table";
 import Map from "./Map";
-import { GrLocation } from "react-icons/gr";
+import { GrFormClose, GrLocation } from "react-icons/gr";
 
-const Table = ({ data, columns }) => {
+const Table = ({ changeSorting, data, columns }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
@@ -12,6 +12,7 @@ const Table = ({ data, columns }) => {
       columns,
       data,
     });
+
 
   const openLocationModal = (location) => {
     setSelectedLocation(location);
@@ -29,11 +30,12 @@ const Table = ({ data, columns }) => {
         <thead>
           {headerGroups.map((headerGroup, index) => (
             <tr key={index} {...headerGroup.getHeaderGroupProps()} className="">
-              {headerGroup.headers.map((column, index) => (
+              {headerGroup.headers.map((column) => (
                 <th
-                  key={index}
+                  key={column.id}
                   {...column.getHeaderProps()}
                   className="p-4 text-[12px] leading-[22px] font-semibold text-[#666767]"
+                  onClick={() => changeSorting(column.id)}
                 >
                   {column.render("Header")}
                 </th>
@@ -42,17 +44,18 @@ const Table = ({ data, columns }) => {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row, index) => {
+          {rows.map((row) => {
             prepareRow(row);
             return (
               <tr
-                key={index}
+                key={row.id}
                 {...row.getRowProps()}
                 className="bg-white rounded-lg shadow-sm my-1"
               >
-                {row.cells.map((cell, index) => (
+                {row.cells.map((cell) => {
+                  return (
                   <td
-                    key={index}
+                    key={cell.row.original.id}
                     {...cell.getCellProps()}
                     className="p-4 text-[12px] leading-[22px] text-[#2E373D] border-r last:border-r-0 "
                   >
@@ -84,7 +87,7 @@ const Table = ({ data, columns }) => {
                       cell.render("Cell")
                     )}
                   </td>
-                ))}
+                )})}
               </tr>
             );
           })}
@@ -94,15 +97,17 @@ const Table = ({ data, columns }) => {
       {/* Modal para mostrar el mapa */}
       {modalOpen && selectedLocation && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg w-1/2 animate-fade-up">
-            <h2 className="text-xl font-bold mb-4">Team Location</h2>
+          <div className="bg-white p-4 rounded-lg w-[90%] md:w-1/2 animate-fade-up">
+            <header className="flex items-center justify-between pb-2">
+              <h2 className="text-xl font-bold mb-4">Team Location</h2>
+              <button
+                onClick={closeLocationModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <GrFormClose className="size-[34px]" />
+              </button>
+            </header>
             <Map location={selectedLocation} />
-            <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              onClick={closeLocationModal}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
