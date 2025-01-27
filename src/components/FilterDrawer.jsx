@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import Slider from "rc-slider";
 import { GrFormSearch } from "react-icons/gr";
 import { GrFormClose } from "react-icons/gr";
@@ -7,10 +7,13 @@ import { colors, countryLeagueMap, maxYear, minYear } from "../constants";
 import "rc-slider/assets/index.css";
 
 const FilterDrawer = ({
+  availableLeagues,
   clearFilters,
   clearSearch,
   filters,
+  handleChange,
   handleChangeSearch,
+  handleSliderChange,
   handleSubmitSearch,
   handleFilterSubmit,
   setFilters,
@@ -19,81 +22,23 @@ const FilterDrawer = ({
   setOpen,
 }) => {
 
-  const [availableLeagues, setAvailableLeagues] = useState([]);
   const [titlesErrorValue, setTitlesErrorValue] = useState(null)
 
-  useEffect(() => {
-    if (filters.country === "") {
-      const nestedLeagues = Object.values(countryLeagueMap);
-      const flatNestedLeaguas = nestedLeagues.flat()
-      setAvailableLeagues(flatNestedLeaguas)
-    }
-  }, [filters.country])
-
-  const handleChange = (key, value) => {
-    if (key === "country") {
-      setFilters((prev) => ({
-        ...prev,
-        country: value,
-        league: "",
-      }));
-      setAvailableLeagues(countryLeagueMap[value] || []);
-    } else if (key === "league") {
-      const country = Object.keys(countryLeagueMap).find((item) =>
-        countryLeagueMap[item].includes(value)
-      );
-      setFilters((prev) => ({
-        ...prev,
-        league: value,
-        country: country || "",
-      }));
-    } else if (key === "titles") {
-      setFilters((prev) => ({
-        ...prev,
-        titles: value
-      }));
-
-      if (value.trim() === "") {
-        setTitlesErrorValue(null);
-        setFilters((prev) => ({
-          ...prev,
-          titles: "", // Resetea el filtro si está vacío
-        }));
-        return;
-      }
-    
-      // Si no es un número, se muestra el error.
-      if (isNaN(value)) {
-        setTitlesErrorValue("The value must be a number");
-        return;
-      }
-    
-      // Si el valor es negativo, muestra el error.
-      if (value < 0) {
-        setTitlesErrorValue("The value must be greater than or equal to 0");
-        return;
-      }
-    
-      // Si pasa las validaciones, limpia el error y guarda el valor.
-      setTitlesErrorValue(null);
-      
-    } else {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    }
-  };
-
-  const handleSliderChange = ([min, max]) => {
-    setFilters((prev) => ({
-      ...prev,
-      minFoundationYear: min,
-      maxFoundationYear: max,
-    }));
+  const areFiltersApplied = () => {
+    return (
+      filters.country ||
+      filters.league ||
+      filters.titles ||
+      filters.colors.length > 0 ||
+      filters.minFoundationYear !== 1850 ||
+      filters.maxFoundationYear !== new Date().getFullYear()
+    );
   };
 
   return (
     <>
       {/* Botón para abrir el drawer */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center items-start mb-4">
         <div className="hidden md:block">
           <form onSubmit={handleSubmitSearch}>
             <label className="bg-white rounded-md flex items-center w-full md:min-w-[400px] min-h-[40px] border border-[#D0D0D0]">
@@ -106,7 +51,7 @@ const FilterDrawer = ({
                 value={search}
                 onChange={(e) => handleChangeSearch(e.target.value)}
               ></input>
-              <button onClick={clearSearch}>
+              <button type="button" onClick={clearSearch}>
                 <GrFormClose className="size-[34px]" />
               </button>
             </label>
@@ -114,10 +59,13 @@ const FilterDrawer = ({
         </div>
         <button
           onClick={() => setOpen(true)}
-          className="rounded-md border border-[#D0D0D0] flex items-center gap-x-2 min-[40px] min-w-[100px] bg-white px-4 py-2 text-[#666767] font-normal text-sm"
+          className="relative rounded-md border border-[#D0D0D0] flex items-center gap-x-2 min-[40px] min-w-[100px] bg-white px-4 py-2 text-[#666767] font-normal text-sm"
         >
           <GrFormFilter className="size-[30px]" />
           <span>Filters</span>
+          {areFiltersApplied() && (
+            <span className="size-[14px] absolute top-[-5px] left-[-5px] rounded-full bg-green-600"></span>
+          )}
         </button>
       </div>
 
@@ -220,7 +168,7 @@ const FilterDrawer = ({
               >
                 {colors.map((color) => (
                   <label
-                    key={color}
+                    key={color.color}
                     className={`pl-[15px] flex items-center mb-2 rounded-lg bg-white text-xs leading-[14px] min-h-[40px] w-full pointer justify-start gap-x-2 border-2  ${filters.colors?.includes(color.color)
                       ? "border-[#000000]"
                       : "border-transparent"
