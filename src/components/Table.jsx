@@ -7,6 +7,7 @@ import NotFound from "./icons/notFound";
 const Table = ({ changeSorting, data, columns }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedTeamLocation, setSelectedTeamLocation] = useState(null);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({
@@ -15,14 +16,16 @@ const Table = ({ changeSorting, data, columns }) => {
     });
 
 
-  const openLocationModal = (location) => {
+  const openLocationModal = (location, name) => {
     setSelectedLocation(location);
+    setSelectedTeamLocation(name);
     setModalOpen(true);
   };
 
   const closeLocationModal = () => {
     setModalOpen(false);
     setSelectedLocation(null);
+    setSelectedTeamLocation(null);
   };
 
   if (data.length === 0) return (
@@ -95,7 +98,7 @@ const Table = ({ changeSorting, data, columns }) => {
                       ) : cell.column.id === "location" ? (
                         <button
                           className="px-4 py-2 rounded"
-                          onClick={() => openLocationModal(row.original.location)}
+                          onClick={() => openLocationModal(row.original.location, row.cells[0].value)}
                         >
                           <GrLocation className="size-[24px]" />
                         </button>
@@ -116,7 +119,7 @@ const Table = ({ changeSorting, data, columns }) => {
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg w-[90%] md:w-1/2 animate-fade-up">
             <header className="flex items-center justify-between pb-2">
-              <h2 className="text-xl font-bold mb-4">Team Location</h2>
+              <h2 className="text-xl font-bold mb-4">{selectedTeamLocation}{" "}Location</h2>
               <button
                 onClick={closeLocationModal}
                 className="text-gray-500 hover:text-gray-700"
