@@ -79,7 +79,7 @@ const FilterDrawer = ({
 
       {/* Contenedor del drawer */}
       {open && (
-        <div className="fixed top-0 right-0 w-[90%] md:w-[334px] h-full bg-gray-100 shadow-lg z-20 animate-fade-left animate-duration-500">
+        <div className="fixed top-0 right-0 w-[90%] md:w-[334px] h-full bg-gray-100 shadow-lg z-50 animate-fade-left animate-duration-500">
           <h2 className="flex items-center justify-between bg-[#D1E4F0] p-3 pl-[40px] md:pl-3 text-sm font-bold leading-[16px] text-[#000000]">
             Filters
             <button

@@ -405,7 +405,7 @@ const App = () => {
     <div className="p-2 md:p-6 relative">
       <header className="px-4 md:px-8 ">
         <Link to="/">
-          <h1 className="flex gap-x-4 items-center text-2xl">
+          <h1 className="flex gap-x-4 items-center text-2xl text-[#EFEFEF]">
             <img src={"/favicon2.png"} alt="logo pelota" className="max-w-full w-[50px] object-cover" />
             Football
           </h1>
@@ -432,7 +432,7 @@ const App = () => {
 
       <button
         id="scroll-to-top"
-        className="hidden fixed bottom-10 right-5 p-[.1rem] flex-col justify-center items-center shadow-lg cursor-pointer z-50 size-[40px] rotate-45 transform text-base font-semibold bg-[#2e373d] rounded-[10px]"
+        className="hidden fixed bottom-10 right-5 p-[.1rem] flex-col justify-center items-center shadow-lg cursor-pointer z-20 size-[40px] rotate-45 transform text-base font-semibold bg-[#2e373d] rounded-[10px]"
         onClick={() => {
           window.scrollTo({
             left: 0,
